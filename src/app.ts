@@ -13,7 +13,11 @@ import "./styles/main.scss";
 export function createApp(ssr = false) {
 	const app: VueApp = createVueApp(App);
 	const router = createRouter({
-		history: ssr ? createMemoryHistory("/") : createWebHistory("/"),
+		// base 跟随构建配置（GitHub Pages 分站为 /REBLOG/），RouterLink 的绝对
+		// to 值会自动拼接该前缀
+		history: ssr
+			? createMemoryHistory(import.meta.env.BASE_URL)
+			: createWebHistory(import.meta.env.BASE_URL),
 		routes,
 		scrollBehavior(_to, _from, savedPosition) {
 			if (savedPosition) return savedPosition;

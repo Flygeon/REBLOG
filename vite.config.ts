@@ -6,6 +6,8 @@ import { fileURLToPath, URL } from "node:url";
 // - 开发期：vite dev 提供 SPA 调试
 // - 生产期：先 `vite build` 产出客户端资源，再 scripts/ssg.mjs 预渲染各路由为静态 HTML
 export default defineConfig({
+  // 分站（GitHub Pages）部署在 /REBLOG/ 子路径下，由 VITE_BASE 注入；主站保持 /
+  base: process.env.VITE_BASE || "/",
   plugins: [vue()],
   resolve: {
     alias: {

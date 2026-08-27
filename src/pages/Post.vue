@@ -38,22 +38,22 @@
 
           <!-- 上下篇 -->
           <nav v-if="post.data.prevSlug || post.data.nextSlug" class="post__pager">
-            <a
+            <RouterLink
               v-if="post.data.nextSlug"
               class="post__pager-link"
-              :href="`/posts/${post.data.nextSlug}/`"
+              :to="toLink(`/posts/${post.data.nextSlug}/`)"
             >
               <span class="post__pager-label">下一篇</span>
               <span class="post__pager-title">{{ post.data.nextTitle }}</span>
-            </a>
-            <a
+            </RouterLink>
+            <RouterLink
               v-if="post.data.prevSlug"
               class="post__pager-link post__pager-link--next"
-              :href="`/posts/${post.data.prevSlug}/`"
+              :to="toLink(`/posts/${post.data.prevSlug}/`)"
             >
               <span class="post__pager-label">上一篇</span>
               <span class="post__pager-title">{{ post.data.prevTitle }}</span>
-            </a>
+            </RouterLink>
           </nav>
 
           <!-- 文章推荐（横排卡片流：相关文章 + 随机文章） -->
@@ -69,11 +69,11 @@
 
             <div class="post__related-grid">
               <!-- 相关文章卡片 -->
-              <a
+              <RouterLink
                 v-for="p in recommended"
                 :key="`rel-${p.slug}`"
                 class="rec-card"
-                :href="`/posts/${p.slug}/`"
+                :to="toLink(`/posts/${p.slug}/`)"
                 :aria-label="`阅读文章：${p.data.title}`"
               >
                 <div class="rec-card__cover">
@@ -99,14 +99,14 @@
                     <AppIcon class="rec-card__arrow" name="arrow_forward" :size="18" />
                   </div>
                 </div>
-              </a>
+              </RouterLink>
 
               <!-- 随机文章卡片 -->
-              <a
+              <RouterLink
                 v-for="p in randomPosts"
                 :key="`rand-${p.slug}`"
                 class="rec-card"
-                :href="`/posts/${p.slug}/`"
+                :to="toLink(`/posts/${p.slug}/`)"
                 :aria-label="`阅读文章：${p.data.title}`"
               >
                 <div class="rec-card__cover">
@@ -132,7 +132,7 @@
                     <AppIcon class="rec-card__arrow" name="arrow_forward" :size="18" />
                   </div>
                 </div>
-              </a>
+              </RouterLink>
             </div>
           </section>
 
@@ -154,7 +154,7 @@
     <div v-else class="post__notfound">
       <h1>文章未找到</h1>
       <p>你访问的文章可能已被删除或不存在。</p>
-      <a href="/">返回首页</a>
+      <RouterLink to="/">返回首页</RouterLink>
     </div>
   </div>
 </template>
@@ -167,11 +167,13 @@ import Giscus from "@components/Giscus.vue";
 import Toc, { type TocHeading } from "@components/Toc.vue";
 import { allPosts, getPostBody } from "@lib/posts";
 import { renderMarkdown } from "@lib/markdown";
-import { getCategoryUrl, getTagUrl } from "@utils/url-utils";
+import { getCategoryUrl, getTagUrl, toRouterLink } from "@utils/url-utils";
 import { getRecommendedPosts, getRandomPosts } from "@utils/content-utils";
 import { setHead } from "@lib/head";
 
 const route = useRoute();
+// 站内跳转统一走 RouterLink（SPA 过渡），to 去尾斜杠
+const toLink = toRouterLink;
 const html = ref("");
 const headings = ref<TocHeading[]>([]);
 

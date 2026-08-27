@@ -13,19 +13,21 @@
         因此预渲染 HTML 不受影响；fallback 仅在客户端异步挂载期间短暂显示。
       -->
       <router-view v-slot="{ Component }">
-        <Suspense>
-          <!-- 路由切换动画：key 绑定 path，同组件不同参数（/posts/a → /posts/b）也会触发 -->
-          <Transition name="route" mode="out-in">
+        <!-- Swup 式切换：Transition 包在外层，mode=out-in 先淡出旧页再淡入新页；
+             Suspense timeout=400 让文章页（shiki 异步）在快速解析时直接跳过
+             加载 fallback，避免「淡出→加载点闪现→瞬移出现」的割裂感 -->
+        <Transition name="route" mode="out-in">
+          <Suspense :timeout="400">
             <component :is="Component" :key="route.path" />
-          </Transition>
-          <template #fallback>
-            <div class="route-loading" aria-hidden="true">
-              <span class="route-loading__dot"></span>
-              <span class="route-loading__dot"></span>
-              <span class="route-loading__dot"></span>
-            </div>
-          </template>
-        </Suspense>
+            <template #fallback>
+              <div class="route-loading" aria-hidden="true">
+                <span class="route-loading__dot"></span>
+                <span class="route-loading__dot"></span>
+                <span class="route-loading__dot"></span>
+              </div>
+            </template>
+          </Suspense>
+        </Transition>
       </router-view>
     </Layout>
   </var-style-provider>
@@ -79,20 +81,18 @@ const varletThemeVars = computed(() => {
 </script>
 
 <style scoped>
-/* 路由切换动画（MD3 emphasized feel：淡入 + 轻微上浮） */
+/* 路由切换动画（复刻原博客 swup 的纯淡入淡出） */
 .route-enter-active {
-  transition: opacity 0.22s ease, transform 0.22s ease;
+  transition: opacity 0.3s ease;
 }
 .route-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.2s ease;
 }
 .route-enter-from {
   opacity: 0;
-  transform: translateY(8px);
 }
 .route-leave-to {
   opacity: 0;
-  transform: translateY(-4px);
 }
 @media (prefers-reduced-motion: reduce) {
   .route-enter-active,

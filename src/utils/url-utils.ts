@@ -42,3 +42,12 @@ export function getDir(path: string): string {
 export function url(path: string) {
 	return joinUrl("", import.meta.env.BASE_URL, path);
 }
+
+/**
+ * 站内链接转 RouterLink 的 to 值：统一去尾斜杠（与 Layout.vue 导航同规则）。
+ * 带 query 的路径只去掉 `?` 前的尾斜杠，query 原样保留。
+ */
+export function toRouterLink(urlStr: string): string {
+	if (urlStr.includes("?")) return urlStr.replace(/\/+\?/, "?");
+	return urlStr.replace(/\/+$/, "") || "/";
+}

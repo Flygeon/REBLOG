@@ -5,31 +5,35 @@
     :style="{ '--card-delay': entranceDelay }"
   >
     <!-- 封面（如有） -->
-    <a
+    <RouterLink
       v-if="image"
       class="post-card__cover"
-      :href="url"
+      :to="toLink(url)"
       :aria-label="title"
     >
       <img :src="resolveImage(image)" :alt="title" loading="lazy" />
       <span class="post-card__cover-overlay"></span>
       <AppIcon class="post-card__enter" name="arrow_forward" :size="26" />
-    </a>
+    </RouterLink>
 
     <div class="post-card__body">
       <!-- 标题行 -->
       <div class="post-card__title-row">
         <AppIcon v-if="pinned" class="post-card__pin" name="push_pin" :size="16" title="置顶" />
-        <a class="post-card__title" :href="url">{{ title }}</a>
+        <RouterLink class="post-card__title" :to="toLink(url)">{{ title }}</RouterLink>
       </div>
 
       <!-- 元信息：日期 / 分类 -->
       <div class="post-card__meta">
         <span class="post-card__date">{{ formatDate(published) }}</span>
         <span v-if="category" class="post-card__sep">·</span>
-        <a v-if="category" class="post-card__category" :href="categoryUrl">
+        <RouterLink
+          v-if="category"
+          class="post-card__category"
+          :to="toLink(categoryUrl)"
+        >
           {{ category }}
-        </a>
+        </RouterLink>
         <span
           v-if="updated && updated > published"
           class="post-card__updated"
@@ -43,14 +47,14 @@
 
       <!-- 标签 -->
       <div v-if="tags && tags.length" class="post-card__tags">
-        <a
+        <RouterLink
           v-for="tag in tags"
           :key="tag"
           class="post-card__tag"
-          :href="tagUrl(tag)"
+          :to="toLink(tagUrl(tag))"
         >
           #{{ tag.trim() }}
-        </a>
+        </RouterLink>
       </div>
 
       <!-- 底部统计 -->
@@ -67,7 +71,7 @@
 import { computed } from "vue";
 import AppIcon from "@components/AppIcon.vue";
 import type { Post } from "@utils/content-utils";
-import { getCategoryUrl, getTagUrl } from "@utils/url-utils";
+import { getCategoryUrl, getTagUrl, toRouterLink } from "@utils/url-utils";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 
@@ -79,6 +83,8 @@ const props = defineProps<{
 }>();
 
 const { post, url } = props;
+// 站内跳转统一走 RouterLink（SPA 过渡），to 去尾斜杠
+const toLink = toRouterLink;
 const title = post.data.title;
 // 入场延迟：每张顺延 40ms，封顶 360ms
 const entranceDelay = `${Math.min((props.index ?? 0) * 40, 360)}ms`;

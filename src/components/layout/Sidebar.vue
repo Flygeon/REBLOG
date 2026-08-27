@@ -37,7 +37,7 @@
       </ul>
     </section>
 
-    <!-- 标签云 -->
+    <!-- 标签云（默认只显示前 12 个，可展开全部） -->
     <section v-if="tags.length" class="side-card">
       <h2 class="side-card__title">
         <AppIcon name="sell" :size="18" />
@@ -45,7 +45,7 @@
       </h2>
       <div class="side-tags">
         <RouterLink
-          v-for="tag in tags"
+          v-for="tag in visibleTags"
           :key="tag.name"
           :to="getTagUrl(tag.name)"
           class="side-chip"
@@ -53,6 +53,15 @@
           #{{ tag.name }}
         </RouterLink>
       </div>
+      <button
+        v-if="tags.length > TAG_PREVIEW"
+        type="button"
+        class="side-tags__toggle"
+        @click="showAllTags = !showAllTags"
+      >
+        {{ showAllTags ? "收起标签" : `展开全部 ${tags.length} 个` }}
+        <AppIcon :name="showAllTags ? 'expand_less' : 'expand_more'" :size="16" />
+      </button>
     </section>
 
     <!-- 正在追的番剧（Bangumi API，静默失败隐藏） -->
@@ -98,6 +107,13 @@ const profile = profileConfig;
 
 const categories = computed(() => getCategoryList(allPosts));
 const tags = computed(() => getTagList(allPosts));
+
+/* 标签折叠：预览前 12 个，点击展开全部 */
+const TAG_PREVIEW = 12;
+const showAllTags = ref(false);
+const visibleTags = computed(() =>
+  showAllTags.value ? tags.value : tags.value.slice(0, TAG_PREVIEW),
+);
 
 /* ---- 正在追：subject_type=2(动画) 收藏里 type=3(doing) 的条目 ---- */
 interface BgmItem {
@@ -260,6 +276,23 @@ onMounted(async () => {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+}
+.side-tags__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-top: 0.6rem;
+  padding: 0.25rem 0.6rem;
+  border: none;
+  border-radius: var(--md-sys-shape-corner-full);
+  background: transparent;
+  color: var(--md-sys-color-primary);
+  font-size: var(--md-sys-typescale-label-medium-size);
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+.side-tags__toggle:hover {
+  background: var(--md-sys-state-hover);
 }
 
 /* ---- 正在追（横向海报缩略图） ---- */

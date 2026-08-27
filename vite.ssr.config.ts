@@ -8,6 +8,8 @@ import { fileURLToPath, URL } from "node:url";
 //    vue 等依赖在 SSR 下被 external，放进 manualChunks 会报错。
 //  - 保留相同的 alias 与插件，保证与客户端路径解析一致。
 export default defineConfig({
+  // 与客户端构建保持同一 base（SSR 渲染出的 RouterLink href 依赖它）
+  base: process.env.VITE_BASE || "/",
   plugins: [vue()],
   resolve: {
     alias: {

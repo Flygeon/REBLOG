@@ -1,0 +1,76 @@
+# GitHub Pages 分站部署（镜像站，https://flygeon.github.io/REBLOG/）
+# 主站仍在 Cloudflare Workers（flygeon.top），本工作流产出子路径 /REBLOG/ 版本。
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # 子路径 base：vite 客户端/SSR 构建与 RouterLink href 均会跟随
+      VITE_BASE: /REBLOG/
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # 完整 SSG 管线：客户端构建 → SSR 构建 → 预渲染 → sitemap/rss
+      - run: |
+          pnpm exec vite build
+          pnpm exec vite build --config vite.ssr.config.ts
+          node scripts/ssg.mjs
+
+      # index.html 里的 public 引用（favicon）不带 base，分站子路径下需手动前缀
+      - name: Fix absolute public paths for subpath deploy
+        run: |
+          node -e '
+            const fs = require("fs"), path = require("path");
+            const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+              const p = path.join(d, e.name);
+              if (e.isDirectory()) return walk(p);
+              if (e.name === "index.html") {
+                const s = fs.readFileSync(p, "utf8");
+                fs.writeFileSync(p, s.replaceAll('"/favicon/', '"/REBLOG/favicon/'));
+              }
+            });
+            walk("dist");
+          '
+
+      # Pages 不需要 Jekyll 处理
+      - run: touch dist/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

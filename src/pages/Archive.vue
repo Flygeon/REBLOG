@@ -2,38 +2,29 @@
   <div class="archive page">
     <header class="page__header">
       <h1 class="page__title">归档</h1>
-      <span v-if="filterInfo" class="page__filter">{{ filterInfo }}</span>
     </header>
-
-    <!-- 过滤提示：有过滤时显示清空按钮 -->
-    <div v-if="hasFilter" class="archive__filterbar">
-      <span class="archive__filtertext">
-        {{ filterLabel }}
-      </span>
-      <a class="archive__clear" href="/archive/">清除过滤</a>
-    </div>
 
     <!-- 时间线分组 -->
     <section v-if="groups.length" class="archive__timeline" aria-label="文章归档">
       <div v-for="group in groups" :key="group.year" class="archive__group">
         <div class="archive__year">{{ group.year }}</div>
         <div class="archive__items">
-          <a
+          <RouterLink
             v-for="post in group.posts"
             :key="post.slug"
             class="archive__item"
-            :href="`/posts/${post.slug}/`"
+            :to="`/posts/${post.slug}`"
           >
             <span class="archive__item-date">{{ formatDate(post.data.published) }}</span>
             <span class="archive__item-title">{{ post.data.title }}</span>
-          </a>
+          </RouterLink>
         </div>
       </div>
     </section>
 
     <div v-else class="archive__empty">
       <p>没有符合条件的文章。</p>
-      <a href="/archive/">返回全部归档</a>
+      <RouterLink to="/archive">返回全部归档</RouterLink>
     </div>
   </div>
 </template>
@@ -57,27 +48,8 @@ function formatDate(date: Date): string {
   return `${month}-${day}`;
 }
 
-// 查询参数过滤（对齐原 ArchivePanel：tag / category / uncategorized）
+// 查询参数过滤（tag / category / uncategorized），不做界面提示
 const query = computed(() => route.query);
-const hasFilter = computed(
-  () =>
-    (query.value.tag && query.value.tag.length) ||
-    (query.value.category && query.value.category.length) ||
-    query.value.uncategorized,
-);
-
-const filterLabel = computed(() => {
-  const q = query.value;
-  const parts: string[] = [];
-  if (q.tag) parts.push(`标签 #${q.tag}`);
-  if (q.category) parts.push(`分类 ${q.category}`);
-  if (q.uncategorized) parts.push("未分类");
-  return parts.join(" · ");
-});
-
-const filterInfo = computed(() =>
-  hasFilter.value ? `（${filterLabel.value}）` : "",
-);
 
 const groups = computed<Group[]>(() => {
   let filtered = allPosts;
@@ -127,30 +99,6 @@ setHead({ title: "归档 · Flygeonの小站", description: "全部文章归档"
   font-size: var(--md-sys-typescale-headline-large-size);
   font-weight: 700;
   color: var(--md-sys-color-on-surface);
-}
-.page__filter {
-  font-size: var(--md-sys-typescale-body-medium-size);
-  color: var(--md-sys-color-primary);
-}
-
-.archive__filterbar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  padding: 0.6rem 1rem;
-  background: var(--md-sys-color-secondary-container);
-  border-radius: var(--md-sys-shape-corner-small);
-  font-size: var(--md-sys-typescale-body-medium-size);
-  color: var(--md-sys-color-on-secondary-container);
-}
-.archive__clear {
-  color: var(--md-sys-color-primary);
-  font-weight: 600;
-  text-decoration: none;
-}
-.archive__clear:hover {
-  text-decoration: underline;
 }
 
 /* 时间线 */
