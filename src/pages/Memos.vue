@@ -32,6 +32,20 @@
         </div>
         <div class="memo-card__body">
           <div class="memo-card__content" v-html="renderMemo(memo.content)"></div>
+          <a
+            v-if="memo.image"
+            class="memo-card__image-link"
+            :href="`/moments/media/${memo.image}`"
+            target="_blank"
+            rel="noopener"
+          >
+            <img
+              class="memo-card__image"
+              :src="`/moments/media/${memo.image}`"
+              alt="动态图片"
+              loading="lazy"
+            />
+          </a>
           <div class="memo-card__meta">{{ formatTime(memo.created_at) }}</div>
         </div>
       </article>
@@ -47,15 +61,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import AppIcon from "@components/AppIcon.vue";
+import avatarSrc from "@assets/images/avatar.png";
 import { setHead } from "@lib/head";
 
 setHead({ title: "动态 · Flygeonの小站", description: "Flygeon 的动态" });
 
-const avatarSrc = "/assets/images/avatar.png";
-
 interface Moment {
   id: number;
   content: string;
+  image?: string | null; // R2 key，展示地址 /moments/media/<key>
   created_at: number; // unix 秒
 }
 
@@ -176,5 +190,16 @@ onMounted(async () => {
   font-size: 0.75rem;
   color: var(--md-sys-color-on-surface-variant);
   font-variant-numeric: tabular-nums;
+}
+.memo-card__image-link {
+  display: block;
+  margin-top: 0.6rem;
+  line-height: 0;
+}
+.memo-card__image {
+  max-width: 100%;
+  max-height: 360px;
+  border-radius: var(--md-sys-shape-corner-small);
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 </style>
