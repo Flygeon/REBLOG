@@ -8,6 +8,11 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    // 旧 Astro 站的头像哈希地址：友链站仍在外链，301 到稳定的新地址
+    if (url.pathname === "/_astro/avatar.CCT2o-B8_13KVJb.webp") {
+      return Response.redirect(new URL("/avatar.png", url).toString(), 301);
+    }
+
     // TODO(后续 Phase): Memos 代理
     // if (url.pathname.startsWith("/memos") && env.MEMOS_TARGET) {
     //   const target = new URL(url.pathname + url.search, env.MEMOS_TARGET);
