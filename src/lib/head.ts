@@ -10,6 +10,12 @@ export interface HeadInfo {
 	jsonLd?: object | object[];
 }
 
+/** 全站标题后缀（各页面 title 以 | 拼接） */
+export const SITE_TITLE = "Flygeonの小站";
+/** 全站默认描述：页面未提供 description 时兜底（SEO 建议 60~160 字符） */
+export const SITE_DESCRIPTION =
+	"Flygeon の个人博客：分享 Web 开发与自建项目（Vue 3 自建 SSG 博客、Cloudflare Workers 动态服务），也记录 Bangumi 追番、设计与日常碎碎念。";
+
 let current: HeadInfo = {};
 
 export function setHead(info: HeadInfo): void {

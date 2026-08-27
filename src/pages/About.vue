@@ -18,8 +18,10 @@ const html = ref("");
 const spec = getSpec("about");
 
 setHead({
-  title: "关于 · Flygeonの小站",
-  description: spec?.description || "关于 Flygeon",
+  title: "关于 - Flygeon 与这个小站的故事 | Flygeonの小站",
+  description:
+    spec?.description ||
+    "了解 Flygeon 和这个小站：站长的介绍、博客的技术构成（Vue 3 + Vite 自建 SSG）以及联系方式。",
 });
 
 if (spec) {

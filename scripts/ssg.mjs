@@ -49,9 +49,17 @@ function composeHtml(template, appHtml, head) {
 	// 注入 meta + JSON-LD
 	const inject = [];
 	if (head.description) {
-		inject.push(
-			`<meta name="description" content="${escapeHtml(head.description)}">`,
-		);
+		// 替换模板里已有的默认 description，避免出现重复 meta
+		if (/<meta\s+name="description"[^>]*>/i.test(out)) {
+			out = out.replace(
+				/<meta\s+name="description"[^>]*>/i,
+				`<meta name="description" content="${escapeHtml(head.description)}">`,
+			);
+		} else {
+			inject.push(
+				`<meta name="description" content="${escapeHtml(head.description)}">`,
+			);
+		}
 	}
 	if (head.jsonLd) {
 		inject.push(

@@ -42,7 +42,13 @@ import Pagination from "@components/Pagination.vue";
 import { allPosts } from "@lib/posts";
 import { PAGE_SIZE } from "@constants/constants";
 import { siteConfig } from "@/config";
+import { setHead, SITE_TITLE, SITE_DESCRIPTION } from "@lib/head";
 import bannerUrl from "@assets/images/banner.webp";
+
+setHead({
+  title: `${SITE_TITLE} - Flygeon 的个人博客与自建项目分享`,
+  description: SITE_DESCRIPTION,
+});
 
 const route = useRoute();
 const siteTitle = siteConfig.title;

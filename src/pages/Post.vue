@@ -165,7 +165,7 @@ import { useRoute } from "vue-router";
 import AppIcon from "@components/AppIcon.vue";
 import Giscus from "@components/Giscus.vue";
 import Toc, { type TocHeading } from "@components/Toc.vue";
-import { allPosts, getPostBody } from "@lib/posts";
+import { allPosts, getPostBody, mdToText } from "@lib/posts";
 import { renderMarkdown } from "@lib/markdown";
 import { getCategoryUrl, getTagUrl, toRouterLink } from "@utils/url-utils";
 import { getRecommendedPosts, getRandomPosts } from "@utils/content-utils";
@@ -233,11 +233,16 @@ function formatDate(date: Date): string {
 /** 同步设置页面 head（SSG 注入 <title>/meta/JSON-LD） */
 function setPostHead(p: typeof post.value) {
   if (!p) return;
+  // 无 frontmatter description 时，从正文提取纯文本摘要兜底（SEO）
+  const excerpt = mdToText(getPostBody(p.slug) ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 110);
   setHead({
     title: p.data.title
       ? `${p.data.title} · ${import.meta.env.VITE_SITE_TITLE ?? "Flygeonの小站"}`
       : "Flygeonの小站",
-    description: p.data.description || "",
+    description: p.data.description || excerpt,
     jsonLd: {
       "@context": "https://schema.org",
       "@type": "BlogPosting",

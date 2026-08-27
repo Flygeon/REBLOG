@@ -69,7 +69,11 @@ import { setHead } from "@lib/head";
 
 const query = ref("");
 
-setHead({ title: "搜索 · Flygeonの小站", description: "站内搜索" });
+setHead({
+  title: "站内搜索 - 全站文章检索 | Flygeonの小站",
+  description:
+    "在 Flygeonの小站 内按关键词搜索文章，快速定位开发笔记、项目分享与生活记录等已有内容。",
+});
 
 /** 热门标签（取出现最多的 8 个） */
 const hotTags = computed(() =>

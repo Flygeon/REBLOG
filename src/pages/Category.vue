@@ -35,8 +35,8 @@ const categorizedPosts = computed(() =>
 );
 
 setHead({
-  title: `${decodedCategory.value} · Flygeonの小站`,
-  description: `分类 ${decodedCategory.value} 下的文章`,
+  title: `分类「${decodedCategory.value}」下的全部文章 | Flygeonの小站`,
+  description: `浏览 Flygeonの小站 中分类为「${decodedCategory.value}」的文章，共 ${taggedPosts.value.length} 篇，按分类快速查找同主题内容。`,
 });
 </script>
 

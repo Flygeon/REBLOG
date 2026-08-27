@@ -33,8 +33,8 @@ const taggedPosts = computed(() =>
 );
 
 setHead({
-  title: `#${decodedTag.value} · Flygeonの小站`,
-  description: `标签 ${decodedTag.value} 下的文章`,
+  title: `#${decodedTag.value} 标签下的全部文章 | Flygeonの小站`,
+  description: `浏览 Flygeonの小站 中标签为「${decodedTag.value}」的文章，共 ${taggedPosts.value.length} 篇，涵盖该主题下的开发笔记与相关分享。`,
 });
 </script>
 

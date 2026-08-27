@@ -30,8 +30,8 @@ function slugFromPath(path: string): string {
 
 /* ----------------------- 字数 / 阅读时间统计 ----------------------- */
 
-/** 从 markdown 源剥离语法，提取纯文本（用于字数统计） */
-function mdToText(md: string): string {
+/** 从 markdown 源剥离语法，提取纯文本（用于字数统计 / 摘要提取） */
+export function mdToText(md: string): string {
 	return md
 		// 代码块：保留内容但去掉围栏标记（代码块也是可见内容，计入字数）
 		.replace(/```[a-zA-Z0-9_-]*\n?([\s\S]*?)```/g, "$1")

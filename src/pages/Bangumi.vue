@@ -133,7 +133,11 @@ import { computed, onMounted, ref, watch } from "vue";
 import AppIcon from "@components/AppIcon.vue";
 import { setHead } from "@lib/head";
 
-setHead({ title: "番剧 · Flygeonの小站", description: "Bangumi 收藏" });
+setHead({
+  title: "番剧收藏 - 我的 Bangumi 追番列表 | Flygeonの小站",
+  description:
+    "Flygeon 在 Bangumi 的番剧收藏簿：想看、在看、看过的动画与评分一览，数据通过 Bangumi API 实时同步，支持国内反代与官方图源切换。",
+});
 
 const BANGUMI_USERNAME = "1250652";
 const API_BASE = "https://api.bgm.tv/v0";

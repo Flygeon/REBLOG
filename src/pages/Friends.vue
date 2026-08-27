@@ -44,8 +44,10 @@ const html = ref("");
 
 const spec = getSpec("friends");
 setHead({
-  title: "友链 · Flygeonの小站",
-  description: spec?.description || "交换友链",
+  title: "友链 - 朋友们的小站 | Flygeonの小站",
+  description:
+    spec?.description ||
+    "Flygeonの小站 的友情链接页面：收录朋友们的小站，欢迎留言交换友链，一起在互联网上互相串门。",
 });
 
 if (spec) {

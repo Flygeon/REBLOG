@@ -64,7 +64,11 @@ import AppIcon from "@components/AppIcon.vue";
 import avatarSrc from "@assets/images/avatar.png";
 import { setHead } from "@lib/head";
 
-setHead({ title: "动态 · Flygeonの小站", description: "Flygeon 的动态" });
+setHead({
+  title: "动态 - Flygeon 的最新动态与碎碎念 | Flygeonの小站",
+  description:
+    "Flygeon の动态时间线：随时发布想法、生活琐事与图片，基于自建的 Cloudflare Workers 服务实时更新。",
+});
 
 interface Moment {
   id: number;

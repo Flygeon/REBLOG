@@ -82,7 +82,11 @@ const groups = computed<Group[]>(() => {
     .sort((a, b) => b.year - a.year);
 });
 
-setHead({ title: "归档 · Flygeonの小站", description: "全部文章归档" });
+setHead({
+  title: "归档 - 全站文章时间线 | Flygeonの小站",
+  description:
+    "按时间线浏览 Flygeonの小站 的全部博文，依年份归档整理，方便快速回溯与跳转到感兴趣的文章。",
+});
 </script>
 
 <style scoped>
