@@ -1,5 +1,7 @@
-# GitHub Pages 分站部署（镜像站，https://flygeon.github.io/REBLOG/）
-# 主站仍在 Cloudflare Workers（flygeon.top），本工作流产出子路径 /REBLOG/ 版本。
+# GitHub Pages 分站部署（根域 https://flygeon.github.io/）
+# GitHub 根域只认 <user>.github.io 特殊仓库，因此产物发布到
+# Flygeon/Flygeon.github.io 的 gh-pages 分支（由 peaceiris action 推送）。
+# 主站仍在 Cloudflare Workers（flygeon.top）。
 name: Deploy GitHub Pages
 
 on:
@@ -9,19 +11,14 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: pages-mirror
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    env:
-      # 子路径 base：vite 客户端/SSR 构建与 RouterLink href 均会跟随
-      VITE_BASE: /REBLOG/
     steps:
       - uses: actions/checkout@v4
 
@@ -36,29 +33,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # 完整 SSG 管线：客户端构建 → SSR 构建 → 预渲染 → sitemap/rss
+      # 根域部署无需子路径 base（app.ts 的 BASE_URL 默认 "/"）
       - run: |
           pnpm exec vite build
           pnpm exec vite build --config vite.ssr.config.ts
           node scripts/ssg.mjs
 
-      # index.html 里的 public 引用（favicon）不带 base，分站子路径下需手动前缀
-      - name: Fix absolute public paths for subpath deploy
-        run: |
-          find dist -name "index.html" -exec sed -i 's|"/favicon/|"/REBLOG/favicon/|g' {} +
-
-      # Pages 不需要 Jekyll 处理
-      - run: touch dist/.nojekyll
-
-      - uses: actions/upload-pages-artifact@v3
+      - uses: peaceiris/actions-gh-pages@v4
         with:
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          personal_token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
+          external_repository: Flygeon/Flygeon.github.io
+          publish_branch: gh-pages
+          publish_dir: dist
+          force_orphan: true
