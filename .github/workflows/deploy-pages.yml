@@ -44,18 +44,7 @@ jobs:
       # index.html 里的 public 引用（favicon）不带 base，分站子路径下需手动前缀
       - name: Fix absolute public paths for subpath deploy
         run: |
-          node -e '
-            const fs = require("fs"), path = require("path");
-            const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
-              const p = path.join(d, e.name);
-              if (e.isDirectory()) return walk(p);
-              if (e.name === "index.html") {
-                const s = fs.readFileSync(p, "utf8");
-                fs.writeFileSync(p, s.replaceAll('"/favicon/', '"/REBLOG/favicon/'));
-              }
-            });
-            walk("dist");
-          '
+          find dist -name "index.html" -exec sed -i 's|"/favicon/|"/REBLOG/favicon/|g' {} +
 
       # Pages 不需要 Jekyll 处理
       - run: touch dist/.nojekyll
