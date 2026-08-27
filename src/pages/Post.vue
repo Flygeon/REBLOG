@@ -136,9 +136,9 @@
             </div>
           </section>
 
-          <!-- 评论（YuuComments 预留位，后续 Phase 集成） -->
+          <!-- 评论（giscus / GitHub Discussions，主题跟随站点亮暗切换） -->
           <section class="post__comments">
-            <div id="yu-comments" data-id="yuComments"></div>
+            <Giscus />
           </section>
         </div>
 
@@ -163,6 +163,7 @@
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import AppIcon from "@components/AppIcon.vue";
+import Giscus from "@components/Giscus.vue";
 import Toc, { type TocHeading } from "@components/Toc.vue";
 import { allPosts, getPostBody } from "@lib/posts";
 import { renderMarkdown } from "@lib/markdown";

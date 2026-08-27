@@ -90,6 +90,21 @@ export const profileConfig: ProfileConfig = {
 	],
 };
 
+/**
+ * giscus 评论系统（基于 GitHub Discussions）
+ * repoId / categoryId 通过 giscus.app 生成，或 GraphQL API 查询。
+ * 亮暗主题由 Giscus.vue 跟随站点主题动态切换。
+ */
+export const giscusConfig = {
+	repo: "Flygeon/REBLOG",
+	repoId: "R_kgDOUGFS1Q",
+	category: "Announcements",
+	categoryId: "DIC_kwDOUGFS1c4DET_m",
+	lang: "zh-CN",
+	/** 站点亮/暗主题对应的 giscus 主题名 */
+	themes: { light: "light", dark: "transparent_dark" } as const,
+};
+
 export const licenseConfig: LicenseConfig = {
 	enable: true,
 	name: "CC BY-NC-SA 4.0",
