@@ -34,10 +34,7 @@ jobs:
 
       # 完整 SSG 管线：客户端构建 → SSR 构建 → 预渲染 → sitemap/rss
       # 根域部署无需子路径 base（app.ts 的 BASE_URL 默认 "/"）
-      - run: |
-          pnpm exec vite build
-          pnpm exec vite build --config vite.ssr.config.ts
-          node scripts/ssg.mjs
+      - run: pnpm build:ssg
 
       - uses: peaceiris/actions-gh-pages@v4
         with:
