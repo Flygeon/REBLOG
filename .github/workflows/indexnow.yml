@@ -41,21 +41,21 @@ jobs:
           echo "::warning::等待 30 分钟仍未见新指纹，可能构建失败或未触发，继续用旧 URL 提交兜底"
 
       - name: Collect URLs from live sitemap
-        id: urls
         run: |
           curl -fsSL "$SITE/sitemap.xml" \
             | grep -o '<loc>[^<]*</loc>' \
             | sed -e 's/<loc>//' -e 's/<\/loc>//' > urls.txt
           echo "共 $(wc -l < urls.txt) 个 URL"
           {
-            echo 'json<<EOF'
             printf '{"host":"flygeon.top","key":"%s","keyLocation":"%s/%s.txt","urlList":[' \
               "$INDEXNOW_KEY" "$SITE" "$INDEXNOW_KEY"
-            paste -sd, urls.txt | sed -e 's/\([^,]*\)/"\1"/g'
+            # 逐行拼 JSON 字符串数组："u1","u2",...
+            awk 'BEGIN{ORS=""} {printf "%s\"%s\"", (NR>1?",":""), $0}' urls.txt
             printf ']}'
-            echo
-            echo 'EOF'
           } > payload.json
+          # 提交前校验 JSON 合法性，避免坏 payload 打到 IndexNow
+          python3 -m json.tool payload.json > /dev/null
+          echo "payload 校验通过：$(head -c 200 payload.json)..."
 
       - name: Submit to IndexNow
         run: |
