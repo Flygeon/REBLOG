@@ -4,10 +4,10 @@
       <h1 class="page__title">动态</h1>
       <a
         class="page__ext"
-        href="https://memos.flygeon.top"
+        href="/moments/"
         target="_blank"
         rel="noopener"
-        >前往 Memos <AppIcon class="page__ext-icon" name="open_in_new" :size="14" /></a
+        >管理动态 <AppIcon class="page__ext-icon" name="open_in_new" :size="14" /></a
       >
     </header>
 
@@ -17,7 +17,7 @@
     <!-- 加载失败 -->
     <div v-else-if="error" class="memos__state">
       动态加载失败：{{ error }}
-      <p class="memos__hint">可通过 Memos 公开站查看：memos.flygeon.top</p>
+      <p class="memos__hint">稍后再试，或前往管理页检查：flygeon.top/moments/</p>
     </div>
 
     <!-- 动态列表 -->
@@ -32,15 +32,7 @@
         </div>
         <div class="memo-card__body">
           <div class="memo-card__content" v-html="renderMemo(memo.content)"></div>
-          <div class="memo-card__meta">
-            <a
-              :href="`https://memos.flygeon.top/m/${memo.id}`"
-              target="_blank"
-              rel="noopener"
-            >
-              {{ formatTime(memo.createdTs) }}
-            </a>
-          </div>
+          <div class="memo-card__meta">{{ formatTime(memo.created_at) }}</div>
         </div>
       </article>
     </section>
@@ -57,22 +49,21 @@ import { onMounted, ref } from "vue";
 import AppIcon from "@components/AppIcon.vue";
 import { setHead } from "@lib/head";
 
-setHead({ title: "动态 · Flygeonの小站", description: "Memos 动态" });
+setHead({ title: "动态 · Flygeonの小站", description: "Flygeon 的动态" });
 
 const avatarSrc = "/assets/images/avatar.png";
 
-interface Memo {
+interface Moment {
   id: number;
   content: string;
-  createdTs: number;
-  state: string;
+  created_at: number; // unix 秒
 }
 
-const memos = ref<Memo[]>([]);
+const memos = ref<Moment[]>([]);
 const loading = ref(true);
 const error = ref("");
 
-/** 渲染 memos 内容：把换行转 <br>，简单转义 */
+/** 渲染动态内容：把换行转 <br>，简单转义 */
 function renderMemo(content: string): string {
   return content
     .replace(/&/g, "&amp;")
@@ -81,21 +72,21 @@ function renderMemo(content: string): string {
     .replace(/\n/g, "<br>");
 }
 
-function formatTime(ts: number): string {
-  const d = new Date(ts * 1000);
+function formatTime(unixSeconds: number): string {
+  const d = new Date(unixSeconds * 1000);
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 onMounted(async () => {
   try {
-    const res = await fetch("/api/memos", {
+    // 数据源：Moments Worker（同域 flygeon.top/moments/api/*）
+    const res = await fetch("/moments/api/list?limit=50", {
       signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    memos.value = Array.isArray(data.memos) ? data.memos : [];
-    if (data.error) error.value = data.error;
+    memos.value = Array.isArray(data.moments) ? data.moments : [];
   } catch (e) {
     error.value = e instanceof Error ? e.message : "网络错误";
   } finally {
@@ -184,12 +175,6 @@ onMounted(async () => {
   margin-top: 0.5rem;
   font-size: 0.75rem;
   color: var(--md-sys-color-on-surface-variant);
-}
-.memo-card__meta a {
-  color: inherit;
-  text-decoration: none;
-}
-.memo-card__meta a:hover {
-  color: var(--md-sys-color-primary);
+  font-variant-numeric: tabular-nums;
 }
 </style>

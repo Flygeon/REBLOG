@@ -4,6 +4,51 @@
       <h1 class="page__title">番剧</h1>
     </header>
 
+    <!-- 图源切换 + 均分（对齐原站：国内反代源 / 官方源） -->
+    <div v-if="items.length" class="bangumi__source-row">
+      <button
+        type="button"
+        class="bangumi__source-card"
+        :class="{ 'bangumi__source-card--active': imageSource === 'domestic' }"
+        :aria-pressed="imageSource === 'domestic'"
+        @click="imageSource = 'domestic'"
+      >
+        <span class="bangumi__source-icon bangumi__source-icon--domestic">
+          <AppIcon name="database" :size="22" />
+        </span>
+        <span>
+          <span class="bangumi__source-label">图源</span>
+          <span class="bangumi__source-name">国内源</span>
+        </span>
+      </button>
+      <button
+        type="button"
+        class="bangumi__source-card"
+        :class="{ 'bangumi__source-card--active': imageSource === 'official' }"
+        :aria-pressed="imageSource === 'official'"
+        @click="imageSource = 'official'"
+      >
+        <span class="bangumi__source-icon bangumi__source-icon--official">
+          <AppIcon name="public" :size="22" />
+        </span>
+        <span>
+          <span class="bangumi__source-label">图源</span>
+          <span class="bangumi__source-name">官方源</span>
+        </span>
+      </button>
+      <div class="bangumi__source-card bangumi__source-card--static">
+        <span class="bangumi__source-icon bangumi__source-icon--score">
+          <AppIcon name="star" :size="22" />
+        </span>
+        <span>
+          <span class="bangumi__source-label">Bangumi 均分</span>
+          <span class="bangumi__source-name bangumi__source-score">
+            {{ averageScore.toFixed(1) }}
+          </span>
+        </span>
+      </div>
+    </div>
+
     <!-- 状态筛选（Varlet tabs） -->
     <div v-if="items.length" class="bangumi__tabs">
       <var-tabs
@@ -59,7 +104,7 @@
       >
         <div class="bangumi__card-img">
           <img
-            :src="item.subject.images?.common || ''"
+            :src="coverUrl(item)"
             :alt="item.subject.name_cn || item.subject.name"
             loading="lazy"
           />
@@ -84,7 +129,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
+import AppIcon from "@components/AppIcon.vue";
 import { setHead } from "@lib/head";
 
 setHead({ title: "番剧 · Flygeonの小站", description: "Bangumi 收藏" });
@@ -147,6 +193,41 @@ const filteredItems = computed(() =>
   ),
 );
 
+/* ---- 图源切换：国内反代 lain.flygeon.top / 官方 lain.bgm.tv ---- */
+const SOURCE_STORAGE_KEY = "bangumi-image-source";
+const imageSource = ref<"domestic" | "official">(
+  typeof localStorage !== "undefined" &&
+    localStorage.getItem(SOURCE_STORAGE_KEY) === "official"
+    ? "official"
+    : "domestic",
+);
+watch(imageSource, (v) => {
+  try {
+    localStorage.setItem(SOURCE_STORAGE_KEY, v);
+  } catch {
+    /* ignore */
+  }
+});
+
+/** 按当前图源取封面：官方 URL 替换 host 得到反代地址 */
+function coverUrl(item: BangumiItem): string {
+  const official = item.subject.images?.common || "";
+  if (!official || imageSource.value === "official") return official;
+  return official.replace(
+    "https://lain.bgm.tv/",
+    "https://lain.flygeon.top/",
+  );
+}
+
+/** 当前筛选下有评分条目的均分 */
+const averageScore = computed(() => {
+  const scored = filteredItems.value.filter((i) => i.subject.score > 0);
+  if (!scored.length) return 0;
+  return (
+    scored.reduce((sum, i) => sum + i.subject.score, 0) / scored.length
+  );
+});
+
 function statusLabel(type: number): string {
   return STATUS_LABELS[type] ?? "未知";
 }
@@ -206,6 +287,91 @@ onMounted(async () => {
 /* 筛选 tabs（Varlet tabs 容器） */
 .bangumi__tabs {
   margin-bottom: 1.25rem;
+}
+
+/* ---- 图源切换 + 均分卡片 ---- */
+.bangumi__source-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.bangumi__source-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 4.25rem;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font: inherit;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface-container-low);
+  color: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+button.bangumi__source-card {
+  cursor: pointer;
+}
+button.bangumi__source-card:hover {
+  box-shadow: var(--md-sys-elevation-1);
+}
+.bangumi__source-card--active {
+  border-color: var(--md-sys-color-primary);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
+}
+.bangumi__source-card--static {
+  cursor: default;
+}
+.bangumi__source-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: var(--md-sys-shape-corner-small);
+}
+.bangumi__source-icon--domestic {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 14%,
+    transparent
+  );
+  color: var(--md-sys-color-primary);
+}
+.bangumi__source-icon--official {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-secondary) 14%,
+    transparent
+  );
+  color: var(--md-sys-color-secondary);
+}
+.bangumi__source-icon--score {
+  background: color-mix(in srgb, oklch(0.75 0.15 85) 18%, transparent);
+  color: oklch(0.68 0.13 75);
+}
+.bangumi__source-label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.bangumi__source-name {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--md-sys-color-on-surface);
+}
+.bangumi__source-score {
+  font-size: 1.25rem;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) {
+  .bangumi__source-row {
+    grid-template-columns: 1fr;
+  }
 }
 .bangumi__tab-count {
   font-size: 0.7rem;
