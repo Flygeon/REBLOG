@@ -11,12 +11,24 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const distDir = path.join(root, "dist");
 const ssrEntry = path.join(root, "dist-ssr", "entry-server.js");
+
+// 构建指纹（git 短 SHA）：注入每页 <meta name="build">，
+// 供 CI 轮询线上页面判断 Workers 构建是否完成（如 IndexNow 推送前等待）
+let buildId = "";
+try {
+	buildId = execSync("git rev-parse --short HEAD", { cwd: root })
+		.toString()
+		.trim();
+} catch {
+	// 无 git 环境（如某些 CI 浅克隆）则跳过指纹
+}
 
 // Windows 下 ESM 动态 import 需要 file:// URL（ERR_UNSUPPORTED_ESM_URL_SCHEME）
 const { render, getPrerenderUrls } = await import(pathToFileURL(ssrEntry).href);
@@ -68,6 +80,13 @@ function composeHtml(template, appHtml, head) {
 	}
 	if (inject.length) {
 		out = out.replace("</head>", inject.join("\n") + "\n</head>");
+	}
+	// 构建指纹（版本追踪 / CI 部署完成检测）
+	if (buildId) {
+		out = out.replace(
+			"</head>",
+			`<meta name="build" content="${buildId}">\n</head>`,
+		);
 	}
 
 	// 用预渲染内容替换 #app 内部

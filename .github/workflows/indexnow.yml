@@ -1,0 +1,65 @@
+# IndexNow 自动推送：push 到 main 后，等 Workers 构建上线再 ping Bing
+#
+# 问题背景：主站 Cloudflare Workers 由 GitHub 自动同步构建，构建需要几分钟；
+# 如果 push 后立刻 ping，Bing 抓到的还是旧版页面。
+# 解法：构建时 ssg.mjs 会把 git 短 SHA 注入每页 <meta name="build">，
+# 本 workflow 轮询线上首页直到出现本次 commit 的 SHA（说明新版已上线），
+# 再从线上 sitemap.xml 收集 URL 提交 IndexNow；轮询超时则照常提交兜底。
+name: IndexNow Ping
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: true
+
+env:
+  SITE: https://flygeon.top
+  INDEXNOW_KEY: f4735aca25723a677f28b7d1f7cf4d45
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Workers build to go live
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          echo "等待线上出现构建指纹 $SHORT_SHA ..."
+          for i in $(seq 1 60); do
+            if curl -fsSL "$SITE/" | grep -qF "\"$SHORT_SHA\""; then
+              echo "新版已上线（第 $i 次检查）"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::warning::等待 30 分钟仍未见新指纹，可能构建失败或未触发，继续用旧 URL 提交兜底"
+
+      - name: Collect URLs from live sitemap
+        id: urls
+        run: |
+          curl -fsSL "$SITE/sitemap.xml" \
+            | grep -o '<loc>[^<]*</loc>' \
+            | sed -e 's/<loc>//' -e 's/<\/loc>//' > urls.txt
+          echo "共 $(wc -l < urls.txt) 个 URL"
+          {
+            echo 'json<<EOF'
+            printf '{"host":"flygeon.top","key":"%s","keyLocation":"%s/%s.txt","urlList":[' \
+              "$INDEXNOW_KEY" "$SITE" "$INDEXNOW_KEY"
+            paste -sd, urls.txt | sed -e 's/\([^,]*\)/"\1"/g'
+            printf ']}'
+            echo
+            echo 'EOF'
+          } > payload.json
+
+      - name: Submit to IndexNow
+        run: |
+          curl -fsS -X POST https://api.indexnow.org/indexnow \
+            -H "Content-Type: application/json; charset=utf-8" \
+            --data-binary @payload.json \
+            -w "\nhttp:%{http_code}\n"
