@@ -1,0 +1,18 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+dist-ssr/
+
+# 本地工具状态
+.workbuddy/
+.claude/
+
+# 临时文件
+_tmp_*
+
+# 日志与系统文件
+*.log
+.DS_Store
+Thumbs.db

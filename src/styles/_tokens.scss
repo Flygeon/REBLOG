@@ -1,0 +1,222 @@
+// ============================================================
+// MD3 设计系统 tokens（靛蓝主色）
+// 基于 Material Design 3 规范 + impeccable 色彩原则
+//
+// 结构：
+//  1. 原始 token（md.ref.*）：oklch 色板原值
+//  2. 语义 token（md.sys.*）：color roles / type scale / shape / elevation
+//  3. 状态层（state layers）：hover/pressed/focus 用 alpha 叠层
+//  4. 组件级别名（--c-*）：供组件引用，与旧组件平滑衔接
+//
+// 全站色相收敛在 --md-ref-hue / --md-ref-hue-2 两个变量，
+// 亮暗双主题共用，换色只改这两个值
+// ============================================================
+
+:root {
+  /* ========== 0. 主题色相（换色入口） ========== */
+  /* primary 色相：250 = 正蓝（天蓝方向，博客阅读友好）。
+     备选：220 靛蓝 / 200 青 / 145 草绿 / 345 玫红（270+ 会偏紫，慎用） */
+  --md-ref-hue: 250;
+  /* secondary 色相：与 primary 拉开 10° 做层次 */
+  --md-ref-hue-2: 240;
+
+  /* ========== 1. 原始色板 ========== */
+  /* primary tonal palette（MD3 风格：40/80 为基准） */
+  --md-ref-primary-10: oklch(22% 0.05 var(--md-ref-hue));
+  --md-ref-primary-20: oklch(31% 0.075 var(--md-ref-hue));
+  --md-ref-primary-30: oklch(40% 0.09 var(--md-ref-hue));
+  --md-ref-primary-40: oklch(48% 0.105 var(--md-ref-hue)); /* light primary */
+  --md-ref-primary-50: oklch(56% 0.115 var(--md-ref-hue));
+  --md-ref-primary-60: oklch(64% 0.12 var(--md-ref-hue));
+  --md-ref-primary-70: oklch(73% 0.115 var(--md-ref-hue));
+  --md-ref-primary-80: oklch(81% 0.105 var(--md-ref-hue)); /* dark primary */
+  --md-ref-primary-90: oklch(90% 0.07 var(--md-ref-hue));
+  --md-ref-primary-95: oklch(95% 0.045 var(--md-ref-hue));
+
+  /* secondary（偏冷 companion 色） */
+  --md-ref-secondary-40: oklch(50% 0.07 var(--md-ref-hue-2));
+  --md-ref-secondary-80: oklch(82% 0.06 var(--md-ref-hue-2));
+
+  /* error（MD3 标准红） */
+  --md-ref-error-40: oklch(52% 0.21 27);
+  --md-ref-error-80: oklch(82% 0.13 27);
+
+  /* ========== 2. 语义 token ========== */
+
+  /* ---- Color Roles（亮色） ---- */
+  --md-sys-color-primary: var(--md-ref-primary-40);
+  --md-sys-color-on-primary: oklch(98% 0.01 var(--md-ref-hue));
+  --md-sys-color-primary-container: var(--md-ref-primary-90);
+  --md-sys-color-on-primary-container: var(--md-ref-primary-10);
+  --md-sys-color-secondary: var(--md-ref-secondary-40);
+  --md-sys-color-on-secondary: oklch(98% 0.005 var(--md-ref-hue-2));
+  --md-sys-color-secondary-container: oklch(90% 0.05 var(--md-ref-hue-2));
+  --md-sys-color-on-secondary-container: oklch(20% 0.04 var(--md-ref-hue-2));
+
+  /* 中性 surface：带主题 hue tint（chroma 0.012） */
+  --md-sys-color-surface: oklch(98.5% 0.006 var(--md-ref-hue));
+  --md-sys-color-surface-dim: oklch(93% 0.008 var(--md-ref-hue));
+  --md-sys-color-surface-bright: oklch(99% 0.004 var(--md-ref-hue));
+  --md-sys-color-surface-container-lowest: oklch(100% 0.002 var(--md-ref-hue));
+  --md-sys-color-surface-container-low: oklch(96.5% 0.007 var(--md-ref-hue));
+  --md-sys-color-surface-container: oklch(95% 0.008 var(--md-ref-hue));
+  --md-sys-color-surface-container-high: oklch(93% 0.009 var(--md-ref-hue));
+  --md-sys-color-surface-container-highest: oklch(91% 0.01 var(--md-ref-hue));
+  --md-sys-color-on-surface: oklch(20% 0.015 var(--md-ref-hue));
+  --md-sys-color-on-surface-variant: oklch(46% 0.02 var(--md-ref-hue));
+  --md-sys-color-outline: oklch(60% 0.02 var(--md-ref-hue));
+  --md-sys-color-outline-variant: oklch(87% 0.012 var(--md-ref-hue));
+  --md-sys-color-scrim: oklch(15% 0.02 var(--md-ref-hue));
+  --md-sys-color-error: var(--md-ref-error-40);
+  --md-sys-color-on-error: oklch(98% 0.01 27);
+  --md-sys-color-error-container: oklch(92% 0.06 27);
+  --md-sys-color-on-error-container: oklch(30% 0.08 27);
+
+  /* ---- Type Scale（MD3 15 类中选核心 8 类） ---- */
+  /* display-small：hero 站名 */
+  --md-sys-typescale-display-small-size: 2.25rem;
+  --md-sys-typescale-display-small-weight: 700;
+  --md-sys-typescale-display-small-line-height: 1.2;
+  --md-sys-typescale-display-small-tracking: -0.01em;
+  /* headline-large/medium：页面大标题 */
+  --md-sys-typescale-headline-large-size: 1.875rem;
+  --md-sys-typescale-headline-large-weight: 700;
+  --md-sys-typescale-headline-large-line-height: 1.3;
+  --md-sys-typescale-headline-large-tracking: -0.01em;
+  --md-sys-typescale-headline-medium-size: 1.5rem;
+  --md-sys-typescale-headline-medium-weight: 600;
+  --md-sys-typescale-headline-medium-line-height: 1.35;
+  --md-sys-typescale-headline-medium-tracking: 0;
+  /* title-large：卡片标题 */
+  --md-sys-typescale-title-large-size: 1.25rem;
+  --md-sys-typescale-title-large-weight: 600;
+  --md-sys-typescale-title-large-line-height: 1.4;
+  --md-sys-typescale-title-large-tracking: 0;
+  /* body-large：正文 */
+  --md-sys-typescale-body-large-size: 1rem;
+  --md-sys-typescale-body-large-weight: 400;
+  --md-sys-typescale-body-large-line-height: 1.75;
+  --md-sys-typescale-body-large-tracking: 0;
+  /* body-medium：次要文本 */
+  --md-sys-typescale-body-medium-size: 0.875rem;
+  --md-sys-typescale-body-medium-weight: 400;
+  --md-sys-typescale-body-medium-line-height: 1.6;
+  --md-sys-typescale-body-medium-tracking: 0;
+  /* label-large：按钮/导航 */
+  --md-sys-typescale-label-large-size: 0.875rem;
+  --md-sys-typescale-label-large-weight: 600;
+  --md-sys-typescale-label-large-line-height: 1.5;
+  --md-sys-typescale-label-large-tracking: 0.02em;
+  /* label-medium：徽章/标签 */
+  --md-sys-typescale-label-medium-size: 0.75rem;
+  --md-sys-typescale-label-medium-weight: 500;
+  --md-sys-typescale-label-medium-line-height: 1.4;
+  --md-sys-typescale-label-medium-tracking: 0.03em;
+
+  /* ---- Shape（MD3 shape tokens） ---- */
+  --md-sys-shape-corner-none: 0;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* ---- Elevation（MD3 用表面色阶代替阴影，阴影仅辅助） ---- */
+  --md-sys-elevation-0: none;
+  --md-sys-elevation-1: 0 1px 2px oklch(15% 0.03 var(--md-ref-hue) / 0.08),
+    0 1px 3px oklch(15% 0.03 var(--md-ref-hue) / 0.06);
+  --md-sys-elevation-2: 0 1px 2px oklch(15% 0.03 var(--md-ref-hue) / 0.1),
+    0 2px 6px oklch(15% 0.03 var(--md-ref-hue) / 0.08);
+  --md-sys-elevation-3: 0 2px 4px oklch(15% 0.03 var(--md-ref-hue) / 0.12),
+    0 4px 10px oklch(15% 0.03 var(--md-ref-hue) / 0.1);
+  --md-sys-elevation-4: 0 4px 8px oklch(15% 0.03 var(--md-ref-hue) / 0.14),
+    0 8px 16px oklch(15% 0.03 var(--md-ref-hue) / 0.12);
+
+  /* ========== 3. 状态层（MD3 state layers） ========== */
+  --md-sys-state-hover: oklch(48% 0.105 var(--md-ref-hue) / 0.08);
+  --md-sys-state-focus: oklch(48% 0.105 var(--md-ref-hue) / 0.12);
+  --md-sys-state-pressed: oklch(48% 0.105 var(--md-ref-hue) / 0.12);
+  --md-sys-state-dragged: oklch(48% 0.105 var(--md-ref-hue) / 0.16);
+
+  /* ========== 4. 组件级别名（旧组件平滑衔接） ========== */
+  --c-bg: var(--md-sys-color-surface);
+  --c-bg-soft: var(--md-sys-color-surface-container);
+  --c-bg-blur: var(--md-sys-color-surface-container-low);
+  --c-text-1: var(--md-sys-color-on-surface);
+  --c-text-2: var(--md-sys-color-on-surface-variant);
+  --c-border: var(--md-sys-color-outline-variant);
+  --c-accent: var(--md-sys-color-primary);
+  --c-primary-soft: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent);
+
+  /* ---- 字体 ---- */
+  --md-font-brand: "Noto Sans SC", "Noto Sans", system-ui, -apple-system,
+    "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --md-font-plain: "Noto Sans SC", system-ui, -apple-system, "Segoe UI",
+    "PingFang SC", "Microsoft YaHei", sans-serif;
+  --md-font-code: "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas,
+    "Liberation Mono", monospace;
+
+  /* ---- 布局度量 ---- */
+  /* 内容阅读列宽（无侧栏页面的正文最大宽度） */
+  --md-layout-content-max: 900px;
+  /* 页面外壳宽度（appbar / 双栏正文+侧栏 / footer 对齐基准） */
+  --md-layout-shell-max: 1180px;
+  /* 右侧信息栏宽度（≥1080px 显示） */
+  --md-layout-sidebar-w: 17.5rem;
+  --md-layout-gutter: clamp(1rem, 4vw, 2rem);
+  --md-layout-header-h: 64px;
+}
+
+/* ========== 暗色主题（一等公民，非亮色反转） ========== */
+[data-theme="dark"] {
+  /* Color Roles（暗色）：primary 用 80 色调，surface 用深色阶 */
+  --md-sys-color-primary: var(--md-ref-primary-80);
+  --md-sys-color-on-primary: oklch(20% 0.04 var(--md-ref-hue));
+  --md-sys-color-primary-container: var(--md-ref-primary-30);
+  --md-sys-color-on-primary-container: var(--md-ref-primary-90);
+  --md-sys-color-secondary: var(--md-ref-secondary-80);
+  --md-sys-color-on-secondary: oklch(20% 0.03 var(--md-ref-hue-2));
+  --md-sys-color-secondary-container: oklch(35% 0.05 var(--md-ref-hue-2));
+  --md-sys-color-on-secondary-container: oklch(90% 0.04 var(--md-ref-hue-2));
+
+  /* 暗色 surface：永不纯黑，带青蓝 tint，靠色阶区分深度 */
+  --md-sys-color-surface: oklch(15% 0.012 var(--md-ref-hue));
+  --md-sys-color-surface-dim: oklch(12% 0.012 var(--md-ref-hue));
+  --md-sys-color-surface-bright: oklch(22% 0.014 var(--md-ref-hue));
+  --md-sys-color-surface-container-lowest: oklch(11% 0.012 var(--md-ref-hue));
+  --md-sys-color-surface-container-low: oklch(17% 0.013 var(--md-ref-hue));
+  --md-sys-color-surface-container: oklch(19% 0.013 var(--md-ref-hue));
+  --md-sys-color-surface-container-high: oklch(22% 0.014 var(--md-ref-hue));
+  --md-sys-color-surface-container-highest: oklch(25% 0.015 var(--md-ref-hue));
+  --md-sys-color-on-surface: oklch(92% 0.008 var(--md-ref-hue));
+  --md-sys-color-on-surface-variant: oklch(68% 0.015 var(--md-ref-hue));
+  --md-sys-color-outline: oklch(55% 0.02 var(--md-ref-hue));
+  --md-sys-color-outline-variant: oklch(32% 0.015 var(--md-ref-hue));
+  --md-sys-color-error: var(--md-ref-error-80);
+  --md-sys-color-on-error: oklch(30% 0.07 27);
+  --md-sys-color-error-container: oklch(40% 0.1 27);
+  --md-sys-color-on-error-container: oklch(92% 0.05 27);
+
+  /* 暗色阴影更含蓄（深度主要靠表面色阶） */
+  --md-sys-elevation-1: 0 1px 2px oklch(5% 0.02 var(--md-ref-hue) / 0.5);
+  --md-sys-elevation-2: 0 2px 4px oklch(5% 0.02 var(--md-ref-hue) / 0.55);
+  --md-sys-elevation-3: 0 4px 8px oklch(5% 0.02 var(--md-ref-hue) / 0.6);
+  --md-sys-elevation-4: 0 6px 12px oklch(5% 0.02 var(--md-ref-hue) / 0.65);
+
+  /* 暗色状态层：用亮色 primary 的 alpha */
+  --md-sys-state-hover: oklch(81% 0.105 var(--md-ref-hue) / 0.1);
+  --md-sys-state-focus: oklch(81% 0.105 var(--md-ref-hue) / 0.14);
+  --md-sys-state-pressed: oklch(81% 0.105 var(--md-ref-hue) / 0.14);
+  --md-sys-state-dragged: oklch(81% 0.105 var(--md-ref-hue) / 0.18);
+
+  /* 组件别名跟随 */
+  --c-bg: var(--md-sys-color-surface);
+  --c-bg-soft: var(--md-sys-color-surface-container);
+  --c-bg-blur: var(--md-sys-color-surface-container-low);
+  --c-text-1: var(--md-sys-color-on-surface);
+  --c-text-2: var(--md-sys-color-on-surface-variant);
+  --c-border: var(--md-sys-color-outline-variant);
+  --c-accent: var(--md-sys-color-primary);
+  --c-primary-soft: color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
+}
