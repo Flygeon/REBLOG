@@ -86,6 +86,13 @@ const items = [
     desc: "欢迎来到安秋的博客Ankyu!",
     siteurl: "https://blog.ankyu.top",
   },
+  {
+    title: "Silvaire's Blog",
+    imgurl:
+      "https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508?s=400&u=0a370792ba6bbb95a04d309171b562bcd7283a0f&v=3",
+    desc: "Per Aspera Ad Astra",
+    siteurl: "https://silvaire.top/",
+  },
 ];
 
 // 客户端随机洗牌（原站 DOMContentLoaded 时打乱顺序）
