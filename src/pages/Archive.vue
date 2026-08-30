@@ -138,7 +138,7 @@ setHead({
 .archive__items::before {
   content: "";
   position: absolute;
-  left: 0;
+  left: 0.22rem;
   top: 0.4rem;
   bottom: 0.4rem;
   width: 2px;
